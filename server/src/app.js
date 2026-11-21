@@ -14,7 +14,7 @@ const app = express();
 // Security / Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // limit each IP to 200 requests per window
+  max: 300, // limit each IP to 300 requests per window
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -25,26 +25,42 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-// CORS configuration
+// CORS configuration supporting localhost, Vercel deployments, Render previews, and custom client URLs
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
+  process.env.CLIENT_URL,
   'http://localhost:5173',
   'http://127.0.0.1:5173',
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'http://localhost:80',
   'http://localhost',
-];
+].filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., mobile apps, curl, server-to-server)
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server, Render health checks)
+      if (!origin) return callback(null, true);
+
+      // Check explicit allowed origins list
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      // Allow any Vercel preview or production deployment (*.vercel.app)
+      if (origin.endsWith('.vercel.app') || /^https:\/\/[a-zA-Z0-9_-]+\.vercel\.app$/.test(origin)) {
+        return callback(null, true);
       }
+
+      // Allow any Render deployment origin (*.onrender.com)
+      if (origin.endsWith('.onrender.com') || /^https:\/\/[a-zA-Z0-9_-]+\.onrender\.com$/.test(origin)) {
+        return callback(null, true);
+      }
+
+      // Wildcard check
+      if (process.env.CLIENT_URL === '*') {
+        return callback(null, true);
+      }
+
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -52,28 +68,37 @@ app.use(
   })
 );
 
-// Body Parsers
+// Body parsers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// API Routes
+// Mount all API routes under /api
 app.use('/api', routes);
 
-// 404 & Centralized Error Handlers
+// Root fallback / health probe
+app.get('/', (req, res) => {
+  res.status(200).json({
+    name: 'ReviewLens AI API',
+    status: 'running',
+    docs: '/api/health',
+    timestamp: new Date().toISOString(),
+  });
+});
+
+// Centralized error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Start server when executed directly (not in test runner)
+// Database initialization
+connectDB();
+
 const PORT = process.env.PORT || 5000;
 
+// Export for tests, start if not imported
 if (process.env.NODE_ENV !== 'test') {
-  connectDB().catch((err) => {
-    console.warn(`[Database] MongoDB connection warning on startup: ${err.message}`);
-  });
-
   app.listen(PORT, () => {
-    console.log(`[Server] ReviewLens API running on http://localhost:${PORT}`);
-    console.log(`[Server] Health check: http://localhost:${PORT}/api/health`);
+    console.log(`[ReviewLens Server] Running on http://localhost:${PORT}`);
+    console.log(`[ReviewLens Server] API mounted at http://localhost:${PORT}/api`);
   });
 }
 

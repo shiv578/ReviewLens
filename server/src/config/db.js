@@ -3,7 +3,12 @@ import mongoose from 'mongoose';
 let isConnected = false;
 
 export const connectDB = async () => {
-  const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/reviewlens';
+  let mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/reviewlens';
+
+  // Sanitize in case MONGODB_URI= is pasted twice into .env
+  if (mongoUri.startsWith('MONGODB_URI=')) {
+    mongoUri = mongoUri.replace(/^MONGODB_URI=/, '').trim();
+  }
 
   try {
     const conn = await mongoose.connect(mongoUri, {
