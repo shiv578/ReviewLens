@@ -97,7 +97,9 @@ export const uploadReviewsBatch = async (req, res) => {
     }
 
     // 2. Process reviews with duplicate detection, caching, batching (5 per chunk), exponential backoff, and Zod validation
+    const startTime = Date.now();
     const processedReviews = await processAllReviewsWithBatchesAndCache(rawRows, 5);
+    const processingTimeMs = Date.now() - startTime;
 
     // 3. Calculate batch metrics
     let positiveCount = 0;
@@ -145,6 +147,7 @@ export const uploadReviewsBatch = async (req, res) => {
           batch.processedCount = savedDocs.length;
           batch.status = 'completed';
           batch.completedAt = new Date();
+          batch.processingTimeMs = processingTimeMs;
           batch.summary = {
             positiveCount,
             neutralCount,
@@ -162,10 +165,20 @@ export const uploadReviewsBatch = async (req, res) => {
       }
     }
 
+    const aiCallsMade = Math.max(0, processedReviews.length - cachedCount - duplicateCount - skippedCount);
+
     return res.status(200).json({
       status: 'ok',
       message: `Processed ${processedReviews.length} reviews (${cachedCount} from cache, ${duplicateCount} duplicates, ${failedCount} failed validation)`,
       batchId: batch?._id || null,
+      costLog: {
+        totalReviews: processedReviews.length,
+        aiCallsMade,
+        cachedCount,
+        duplicateCount,
+        processingTimeMs,
+        speedReviewsPerSec: processingTimeMs > 0 ? Number(((processedReviews.length / (processingTimeMs / 1000))).toFixed(1)) : 0,
+      },
       summary: {
         totalReviews: processedReviews.length,
         positiveCount,

@@ -141,3 +141,105 @@ export const getStats = async (req, res) => {
     });
   }
 };
+
+/**
+ * Returns Cost and Speed Log:
+ * total AI calls made, cached queries served, total processing time,
+ * and breakdown by analysis batches.
+ */
+export const getCostLog = async (req, res) => {
+  const dbStatus = getDbStatus();
+
+  if (!dbStatus.isConnected) {
+    return res.status(200).json({
+      status: 'ok',
+      message: 'Database is offline',
+      data: {
+        summary: {
+          totalBatches: 0,
+          totalReviewsProcessed: 0,
+          totalAiCalls: 0,
+          totalCached: 0,
+          totalProcessingTimeMs: 0,
+          averageSpeedReviewsPerSec: 0,
+          estimatedCostSavingsUsd: '0.00',
+        },
+        batches: [],
+      },
+    });
+  }
+
+  try {
+    const batches = await AnalysisBatch.find()
+      .sort({ createdAt: -1 })
+      .limit(25)
+      .lean();
+
+    let totalReviewsProcessed = 0;
+    let totalAiCalls = 0;
+    let totalCached = 0;
+    let totalProcessingTimeMs = 0;
+
+    const formattedBatches = batches.map((b) => {
+      const summary = b.summary || {};
+      const cached = summary.cachedCount || 0;
+      const duplicates = summary.duplicateCount || 0;
+      const skipped = summary.skippedCount || 0;
+      const totalInBatch = b.totalReviews || b.processedCount || 0;
+      // AI calls made is reviews analyzed fresh by LLM
+      const aiCalls = Math.max(0, totalInBatch - cached - duplicates - skipped);
+      const procTime = b.processingTimeMs || (b.completedAt && b.uploadedAt ? (new Date(b.completedAt) - new Date(b.uploadedAt)) : 1200);
+
+      totalReviewsProcessed += totalInBatch;
+      totalAiCalls += aiCalls;
+      totalCached += cached;
+      totalProcessingTimeMs += procTime;
+
+      const speed = procTime > 0 ? Number(((totalInBatch / (procTime / 1000))).toFixed(1)) : 0;
+
+      return {
+        batchId: b._id,
+        fileName: b.fileName,
+        status: b.status,
+        totalReviews: totalInBatch,
+        aiCallsMade: aiCalls,
+        cachedCount: cached,
+        duplicateCount: duplicates,
+        processingTimeMs: procTime,
+        reviewsPerSecond: speed,
+        completedAt: b.completedAt || b.createdAt,
+      };
+    });
+
+    const overallSpeed =
+      totalProcessingTimeMs > 0
+        ? Number(((totalReviewsProcessed / (totalProcessingTimeMs / 1000))).toFixed(1))
+        : 0;
+
+    // Approximate cost savings: ~$0.00015 per review call saved by caching
+    const estimatedCostSavingsUsd = (totalCached * 0.00015).toFixed(4);
+
+    return res.status(200).json({
+      status: 'ok',
+      data: {
+        summary: {
+          totalBatches: batches.length,
+          totalReviewsProcessed,
+          totalAiCalls,
+          totalCached,
+          totalProcessingTimeMs,
+          averageSpeedReviewsPerSec: overallSpeed,
+          estimatedCostSavingsUsd,
+        },
+        batches: formattedBatches,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching cost and speed log:', error);
+    return res.status(500).json({
+      status: 'error',
+      message: 'Failed to retrieve cost & speed metrics',
+      error: error.message,
+    });
+  }
+};

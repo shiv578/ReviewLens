@@ -25,6 +25,10 @@ const analysisBatchSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    processingTimeMs: {
+      type: Number,
+      default: 0,
+    },
     summary: {
       positiveCount: { type: Number, default: 0 },
       neutralCount: { type: Number, default: 0 },

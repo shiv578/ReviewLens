@@ -15,6 +15,7 @@ import {
   Database,
   Cpu,
   TrendingUp,
+  BarChart3,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 
@@ -23,6 +24,7 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: Upload, badge: 'Upload' },
   { path: '/sentiment', label: 'Sentiment', icon: Brain },
   { path: '/reviews', label: 'Reviews', icon: Search },
+  { path: '/products', label: 'Products', icon: BarChart3 },
   { path: '/ai-reply', label: 'AI Reply', icon: MessageSquareReply, badge: 'AI' },
   { path: '/history', label: 'History', icon: History },
   { path: '/settings', label: 'Settings', icon: Settings },

@@ -4,6 +4,8 @@ import SentimentPulse from '../components/dashboard/SentimentPulse';
 import AIInsightsPanel from '../components/dashboard/AIInsightsPanel';
 import AIAssistant from '../components/assistant/AIAssistant';
 import ReviewDataTable from '../components/dashboard/ReviewDataTable';
+import RatingMismatchPanel from '../components/dashboard/RatingMismatchPanel';
+import CostSpeedLogPanel from '../components/dashboard/CostSpeedLogPanel';
 import { useStats } from '../hooks/useStats';
 
 export default function OverviewPage() {
@@ -36,7 +38,13 @@ export default function OverviewPage() {
         </div>
       </div>
 
-      {/* 4. Full Review Data Table with Filter & One-Click AI Reply */}
+      {/* 4. Rating vs Sentiment Mismatch Check */}
+      <RatingMismatchPanel />
+
+      {/* 5. Cost and Speed Log */}
+      <CostSpeedLogPanel />
+
+      {/* 6. Full Review Data Table with Filter & One-Click AI Reply */}
       <ReviewDataTable />
     </div>
   );
