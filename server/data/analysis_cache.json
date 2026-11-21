@@ -1,0 +1,314 @@
+{
+  "57a523f1fea6f708ba8733d8bfeaa141961c55b04567c93333d658e9f3cd98f0": {
+    "sentiment": "negative",
+    "topics": [
+      "packaging"
+    ],
+    "summary": "Packaging was damaged upon arrival.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:35:38.899Z"
+  },
+  "dc6b033635b81052ad5cf66b300a4bddf96e5c5348f25513c9c0ccd8b016c72b": {
+    "sentiment": "positive",
+    "topics": [
+      "quality",
+      "price"
+    ],
+    "summary": "The fabric is super soft, colors did not fade, and it is worth the price.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:42:00.146Z"
+  },
+  "d6a3e18a793cd197b8feb4123384a1b04dd0a6fbddc1e7065f2d5dde41f317ee": {
+    "sentiment": "negative",
+    "topics": [
+      "size_fit",
+      "quality"
+    ],
+    "summary": "Received queen size instead of the king size ordered, despite acceptable fabric.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:42:00.150Z"
+  },
+  "2f5bfc2f3b3b36874d2884db30878a8f5ac7127ac8c6ed7802e223e1eb8a1fed": {
+    "sentiment": "negative",
+    "topics": [
+      "delivery"
+    ],
+    "summary": "Customer is being sarcastic about the extremely slow three-week delivery time.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:42:00.153Z"
+  },
+  "dc37e76224f450ac4cb6744b341e1e6c4a1a82018771de7adbedbcb5e116aa89": {
+    "sentiment": "negative",
+    "topics": [
+      "quality",
+      "packaging"
+    ],
+    "summary": "The product is good, but the packaging was very poor with a torn box.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:42:00.156Z"
+  },
+  "f90d776d7496649ecfc23a96a1ae0bc296e245121702895810eae8373c1b2ea2": {
+    "sentiment": "positive",
+    "topics": [
+      "quality",
+      "other"
+    ],
+    "summary": "The mugs are beautiful, match the photos, and made a great gift.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:42:00.159Z"
+  },
+  "ee390baae7109ea05ca9a125d19dbcf8e1a0263a2b0661f2a1948ca350b67efb": {
+    "sentiment": "negative",
+    "topics": [
+      "packaging",
+      "delivery",
+      "support",
+      "price"
+    ],
+    "summary": "One mug arrived broken and customer support failed to provide a refund after a 6-day delay.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:43:13.855Z"
+  },
+  "a0f637b7797fbedb4eac8cc938719cf482b2df2d469e0bfcdb1ff7507b34af04": {
+    "sentiment": "negative",
+    "topics": [
+      "quality"
+    ],
+    "summary": "Both mug handles broke within a week of use despite the 5/5 rating.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:43:13.859Z"
+  },
+  "a1e8506eee40737f6aa0b9faa9c86773bc305b1db2730d08f1119d96c8b8f9dc": {
+    "sentiment": "positive",
+    "topics": [
+      "other"
+    ],
+    "summary": "Customer left positive thumbs-up emojis expressing satisfaction.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:43:13.863Z"
+  },
+  "c7228e6a0b46c1a3d583fbde5674e12374ec60593079686e68a7b1cc76a9e46b": {
+    "sentiment": "neutral",
+    "topics": [
+      "quality",
+      "price"
+    ],
+    "summary": "The product quality is good, but it is considered overpriced compared to the local market.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:43:13.866Z"
+  },
+  "059070e6c5c36356fabaf435e9e9df297699c33665bd9a427ccee5dc5b5fb206": {
+    "sentiment": "positive",
+    "topics": [
+      "quality",
+      "price",
+      "packaging"
+    ],
+    "summary": "Sound quality and battery life are great for the price, though the charging case feels cheap.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:43:13.869Z"
+  },
+  "c499aea9604a46bc60bc96e1ed13ea98db2a64749067a436e9b24e6d66f11204": {
+    "sentiment": "negative",
+    "topics": [
+      "quality"
+    ],
+    "summary": "The left earbud stopped working after just two days of use.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:44:58.185Z"
+  },
+  "25c0d57f10ed925a78ff8bca0f9b3fa02b94404e0b64b816a78f74c194f8c6e9": {
+    "sentiment": "negative",
+    "topics": [
+      "quality",
+      "support"
+    ],
+    "summary": "Bluetooth connection keeps dropping repeatedly and customer support was unhelpful.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:44:58.186Z"
+  },
+  "533d0d63b53eec50137a49f00cdbce71f4a9a07962aa0df1e2321f220d770d5f": {
+    "sentiment": "positive",
+    "topics": [
+      "quality",
+      "size_fit",
+      "delivery"
+    ],
+    "summary": "Customer is very happy with the solid bass, comfortable fit, and fast next-day delivery.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:44:58.187Z"
+  },
+  "9091a171f77c21ce893992fb4f3687f3f452bae85c9856790c3a39f96c4a290c": {
+    "sentiment": "neutral",
+    "topics": [
+      "quality"
+    ],
+    "summary": "Sound quality is good, but the battery drains out quickly.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:44:58.189Z"
+  },
+  "a2cf8d35a927c5d2352d65da1d14dd06df8cec7673fe9af0eb3f41ac5826555b": {
+    "sentiment": "positive",
+    "topics": [
+      "quality",
+      "size_fit"
+    ],
+    "summary": "Shoes are very light and comfortable, allowing a half marathon to be run with zero blisters.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:44:58.190Z"
+  },
+  "e28ad92b59482c8060cc855bf44f5cad1ae798572313da566a26ae32d743c4dd": {
+    "sentiment": "negative",
+    "topics": [
+      "size_fit",
+      "support"
+    ],
+    "summary": "The size chart was misleading and the shoes were too tight, but the exchange process was smooth.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:49:58.869Z"
+  },
+  "a56ba944ac1bfafb0974977a0ad8530ae4fc869f169fc233b65d4372b5154d99": {
+    "sentiment": "positive",
+    "topics": [
+      "quality"
+    ],
+    "summary": "The shoes offer good grip and look nice, with normal wear on the sole after two months of daily runs.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:49:58.872Z"
+  },
+  "bb00bf94c4d87b37849475714a02e8401c70525a290181c76f2f63a348e30e9b": {
+    "sentiment": "negative",
+    "topics": [
+      "quality",
+      "other"
+    ],
+    "summary": "Customer received a used pair of shoes with muddy soles, raising concerns about quality checks.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:49:58.874Z"
+  },
+  "9aca8a66aed094f3527cc8b84e0d699b4a197c8ba13ca96d1457cc4af41ce95f": {
+    "sentiment": "neutral",
+    "topics": [
+      "quality",
+      "delivery"
+    ],
+    "summary": "The product is average, but the delivery personnel was rude.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:49:58.877Z"
+  },
+  "f0c44e54acf5146c0972df0f743b0a99baf14ba5720844865f886c1095ed6bb4": {
+    "sentiment": "positive",
+    "topics": [
+      "quality"
+    ],
+    "summary": "The customer considers these the best shoes they have ever purchased online.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:49:58.880Z"
+  },
+  "84363925af9fb1f665108e5d51df7c009c1b3638c2ee74a7780f70dc6538e764": {
+    "sentiment": "neutral",
+    "topics": [
+      "quality"
+    ],
+    "summary": "Good sound quality, but the battery drains quickly.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:50:16.306Z"
+  },
+  "c9b72095acd5c8256e7714f1521f985ee8afb75ea11d3d166da6fc4b6c88277e": {
+    "sentiment": "neutral",
+    "topics": [
+      "quality",
+      "other"
+    ],
+    "summary": "The desk organizer has a neat and sturdy design, but the assembly instructions were confusing.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:50:16.310Z"
+  },
+  "c6d55b84a57b4e9e7da7c282b889b42569c86cbbf666053ed575a377b9bb7424": {
+    "sentiment": "positive",
+    "topics": [
+      "quality"
+    ],
+    "summary": "Customer loves the organizer because it keeps the desk clean and has a nice bamboo scent.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:50:16.314Z"
+  },
+  "637054c12ad9bdd3ccf8d331fe2237104bcc7751ccb7598063c57b3cb4f19851": {
+    "sentiment": "negative",
+    "topics": [
+      "size_fit",
+      "other"
+    ],
+    "summary": "Product is smaller than pictured and barely fits pens, suggesting photos should show real size.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:50:16.318Z"
+  },
+  "42bd2d25da6685346bbf2d6ff6dba50007de70f358b3f581b3e13eaf955ec5ff": {
+    "sentiment": "positive",
+    "topics": [
+      "quality",
+      "price"
+    ],
+    "summary": "Very good product with great quality, though the price is slightly high.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:50:16.323Z"
+  },
+  "798cd90fc9e644c50bc23de1407d6547ed562ff67eeb98847691c5163c202a8d": {
+    "sentiment": "positive",
+    "topics": [
+      "quality"
+    ],
+    "summary": "Customer loves the desk organizer for keeping the desk clean and having a nice bamboo scent.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:54:05.447Z"
+  },
+  "504e727e9617e93075d208c78162940b031204ac51ffd7b0bbf909845c13cc7f": {
+    "sentiment": "negative",
+    "topics": [
+      "delivery",
+      "support"
+    ],
+    "summary": "Package never arrived despite tracking status, and customer support has not responded for 5 days.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:54:05.450Z"
+  },
+  "0162301e8a366f3468154ca56ea424eae76b262ada293b68497d00e55fadbbae": {
+    "sentiment": "positive",
+    "topics": [
+      "quality",
+      "size_fit",
+      "delivery",
+      "price"
+    ],
+    "summary": "High quality and neat stitching, though pillow covers are a bit tight and delivery took 6 days.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:54:05.455Z"
+  },
+  "c3f5ec3b18df5dc177aa0b93ff1183ce73760b0ba56b58da4e172b36a0803d1e": {
+    "sentiment": "neutral",
+    "topics": [
+      "quality"
+    ],
+    "summary": "Mugs are nice but lack microwave safety information on the product page.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:54:05.458Z"
+  },
+  "69c97495d0457d0497a5e0f05ab0e76ff258a9342539c9bc8fb8aac7159fbb93": {
+    "sentiment": "negative",
+    "topics": [
+      "quality"
+    ],
+    "summary": "Earbuds have great sound quality but a terrible microphone that makes calls unusable.",
+    "needs_reply": true,
+    "cachedAt": "2026-11-21T11:54:05.461Z"
+  },
+  "c3763c77ac2881cc9bc690a659a48735833db605300a9a17469eaae622005fac": {
+    "sentiment": "neutral",
+    "topics": [
+      "other"
+    ],
+    "summary": "Review contains random text without meaningful feedback.",
+    "needs_reply": false,
+    "cachedAt": "2026-11-21T11:55:05.939Z"
+  }
+}

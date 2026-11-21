@@ -6,7 +6,7 @@ import {
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
 } from 'recharts';
-import { Brain, Info } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { formatNumber, formatPercent } from '../../utils/formatters';
 
 const PERIODS = ['7 days', '30 days', '90 days'];
@@ -22,56 +22,61 @@ export default function SentimentPulse({ stats, loading }) {
   const donutData =
     total > 0
       ? [
-          { name: 'Positive', value: positive, color: '#10E599' },
-          { name: 'Neutral', value: neutral, color: '#FBBF24' },
-          { name: 'Negative', value: negative, color: '#FF4B72' },
+          { name: 'Positive', value: positive, color: 'var(--sentiment-pos)' },
+          { name: 'Neutral', value: neutral, color: 'var(--sentiment-neu)' },
+          { name: 'Negative', value: negative, color: 'var(--sentiment-neg)' },
         ]
-      : [{ name: 'No Reviews', value: 1, color: '#1A1A22' }];
+      : [{ name: 'No Reviews', value: 1, color: 'var(--bg-surface)' }];
 
   let dominantSentiment = 'Awaiting Reviews';
-  let dominantColor = '#8E8E98';
+  let dominantColor = 'var(--text-secondary)';
   if (total > 0) {
     if (positive >= neutral && positive >= negative) {
       dominantSentiment = 'Positive Sentiment';
-      dominantColor = '#10E599';
+      dominantColor = 'var(--sentiment-pos)';
     } else if (negative >= positive && negative >= neutral) {
       dominantSentiment = 'Needs Attention';
-      dominantColor = '#FF4B72';
+      dominantColor = 'var(--sentiment-neg)';
     } else {
       dominantSentiment = 'Neutral Sentiment';
-      dominantColor = '#FBBF24';
+      dominantColor = 'var(--sentiment-neu)';
     }
   }
 
   return (
-    <div className="rounded-2xl bg-[#0C0C0F] border border-white/10 p-6 md:p-7 min-h-[430px] flex flex-col justify-between shadow-xl">
-      {/* Header & Date Range Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-white/10">
+    <div
+      className="rounded-2xl p-6 md:p-7 min-h-[430px] flex flex-col justify-between shadow-sm transition-colors duration-300"
+      style={{ backgroundColor: 'var(--bg-card)', border: `1px solid var(--border)` }}
+    >
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5" style={{ borderBottom: `1px solid var(--border)` }}>
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-[#00F0FF]/10 flex items-center justify-center text-[#00F0FF] border border-[#00F0FF]/25">
-            <Brain className="h-4.5 w-4.5" />
+          <div
+            className="h-9 w-9 rounded-xl flex items-center justify-center"
+            style={{ backgroundColor: 'var(--accent-soft)', color: 'var(--accent)', border: `1px solid var(--border)` }}
+          >
+            <Brain className="h-4 w-4" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-white tracking-tight">
-              Sentiment Distribution
-            </h3>
-            <p className="text-xs text-[#8E8E98]">
-              Real-time customer satisfaction breakdown
-            </p>
+            <h3 className="text-base font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>Sentiment Distribution</h3>
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Real-time customer satisfaction breakdown</p>
           </div>
         </div>
 
-        {/* Date Filter Tabs */}
-        <div className="inline-flex p-1 rounded-xl bg-[#050507] border border-white/10">
+        <div
+          className="inline-flex p-1 rounded-xl"
+          style={{ backgroundColor: 'var(--bg-surface)', border: `1px solid var(--border)` }}
+        >
           {PERIODS.map((period) => (
             <button
               key={period}
               onClick={() => setSelectedPeriod(period)}
-              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
+              className="px-3 py-1.5 text-xs font-medium rounded-lg transition-all"
+              style={
                 selectedPeriod === period
-                  ? 'bg-[#00F0FF] text-black font-semibold shadow-md shadow-[#00F0FF]/20'
-                  : 'text-[#8E8E98] hover:text-white'
-              }`}
+                  ? { backgroundColor: 'var(--accent)', color: 'var(--btn-text)', fontWeight: 600 }
+                  : { color: 'var(--text-secondary)' }
+              }
             >
               {period}
             </button>
@@ -79,9 +84,9 @@ export default function SentimentPulse({ stats, loading }) {
         </div>
       </div>
 
-      {/* Donut & Metrics Side by Side */}
+      {/* Donut + Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center py-4 flex-1">
-        {/* Donut Chart */}
+        {/* Donut */}
         <div className="sm:col-span-5 flex items-center justify-center relative">
           <div className="h-56 w-56 relative flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -106,11 +111,18 @@ export default function SentimentPulse({ stats, loading }) {
                       if (!payload || !payload.length) return null;
                       const data = payload[0];
                       return (
-                        <div className="px-3 py-1.5 rounded-lg bg-[#000000] border border-white/20 text-xs shadow-2xl">
+                        <div
+                          className="px-3 py-1.5 rounded-lg text-xs shadow-2xl"
+                          style={{
+                            backgroundColor: 'var(--bg-card)',
+                            border: `1px solid var(--border)`,
+                            color: 'var(--text-primary)',
+                          }}
+                        >
                           <span style={{ color: data.payload.color }} className="font-semibold">
                             {data.name}:{' '}
                           </span>
-                          <span className="text-white">{data.value} reviews</span>
+                          <span>{data.value} reviews</span>
                         </div>
                       );
                     }}
@@ -119,66 +131,40 @@ export default function SentimentPulse({ stats, loading }) {
               </PieChart>
             </ResponsiveContainer>
 
-            {/* Inner Center Label */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
-              <span
-                style={{ color: dominantColor }}
-                className="text-sm font-bold tracking-tight"
-              >
+              <span style={{ color: dominantColor }} className="text-sm font-bold tracking-tight">
                 {dominantSentiment}
               </span>
-              <span className="text-xs text-[#8E8E98] mt-1">
+              <span className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
                 {total > 0 ? `${formatNumber(total)} total` : '0 reviews'}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Breakdown Metric Rows */}
+        {/* Rows */}
         <div className="sm:col-span-7 space-y-3">
-          {/* Positive */}
-          <div className="p-3.5 rounded-xl bg-[#141418] border border-white/5 flex items-center justify-between text-xs sm:text-sm">
-            <div className="flex items-center gap-2.5">
-              <span className="h-3 w-3 rounded-full bg-[#10E599]" />
-              <span className="text-white font-medium">Positive</span>
+          {[
+            { label: 'Positive', value: positive, color: 'var(--sentiment-pos)' },
+            { label: 'Neutral', value: neutral, color: 'var(--sentiment-neu)' },
+            { label: 'Negative', value: negative, color: 'var(--sentiment-neg)' },
+          ].map(({ label, value, color }) => (
+            <div
+              key={label}
+              className="p-3.5 rounded-xl flex items-center justify-between text-xs sm:text-sm"
+              style={{ backgroundColor: 'var(--bg-surface)', border: `1px solid var(--border)` }}
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="h-3 w-3 rounded-full" style={{ backgroundColor: color }} />
+                <span className="font-medium" style={{ color: 'var(--text-primary)' }}>{label}</span>
+              </div>
+              <div className="flex items-center gap-3 font-semibold">
+                <span style={{ color: 'var(--text-primary)' }}>{formatNumber(value)}</span>
+                <span className="w-14 text-right" style={{ color }}>{formatPercent(value, total)}</span>
+              </div>
             </div>
-            <div className="flex items-center gap-3 font-semibold">
-              <span className="text-white">{formatNumber(positive)}</span>
-              <span className="text-[#10E599] w-14 text-right">
-                {formatPercent(positive, total)}
-              </span>
-            </div>
-          </div>
-
-          {/* Neutral */}
-          <div className="p-3.5 rounded-xl bg-[#141418] border border-white/5 flex items-center justify-between text-xs sm:text-sm">
-            <div className="flex items-center gap-2.5">
-              <span className="h-3 w-3 rounded-full bg-[#FBBF24]" />
-              <span className="text-white font-medium">Neutral</span>
-            </div>
-            <div className="flex items-center gap-3 font-semibold">
-              <span className="text-white">{formatNumber(neutral)}</span>
-              <span className="text-[#FBBF24] w-14 text-right">
-                {formatPercent(neutral, total)}
-              </span>
-            </div>
-          </div>
-
-          {/* Negative */}
-          <div className="p-3.5 rounded-xl bg-[#141418] border border-white/5 flex items-center justify-between text-xs sm:text-sm">
-            <div className="flex items-center gap-2.5">
-              <span className="h-3 w-3 rounded-full bg-[#FF4B72]" />
-              <span className="text-white font-medium">Negative</span>
-            </div>
-            <div className="flex items-center gap-3 font-semibold">
-              <span className="text-white">{formatNumber(negative)}</span>
-              <span className="text-[#FF4B72] w-14 text-right">
-                {formatPercent(negative, total)}
-              </span>
-            </div>
-          </div>
-
-          <p className="text-xs text-[#8E8E98] pt-1">
+          ))}
+          <p className="text-xs pt-1" style={{ color: 'var(--text-secondary)' }}>
             {total > 0
               ? `Aggregated over ${selectedPeriod}.`
               : 'Upload a CSV to generate sentiment trends.'}

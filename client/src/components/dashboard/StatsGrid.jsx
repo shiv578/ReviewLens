@@ -16,11 +16,12 @@ export default function StatsGrid({ stats, loading, error }) {
         {[1, 2, 3, 4, 5].map((idx) => (
           <div
             key={idx}
-            className="h-36 rounded-2xl bg-[#0C0C0F] border border-white/10 p-5 md:p-6 animate-pulse flex flex-col justify-between"
+            className="h-36 rounded-2xl p-5 md:p-6 animate-pulse flex flex-col justify-between"
+            style={{ backgroundColor: 'var(--bg-card)', border: `1px solid var(--border)` }}
           >
-            <div className="h-4 w-20 bg-white/10 rounded" />
-            <div className="h-8 w-16 bg-white/10 rounded" />
-            <div className="h-2 w-full bg-white/5 rounded" />
+            <div className="h-4 w-20 rounded" style={{ backgroundColor: 'var(--bg-surface)' }} />
+            <div className="h-8 w-16 rounded" style={{ backgroundColor: 'var(--bg-surface)' }} />
+            <div className="h-2 w-full rounded" style={{ backgroundColor: 'var(--bg-surface)' }} />
           </div>
         ))}
       </div>
@@ -29,7 +30,14 @@ export default function StatsGrid({ stats, loading, error }) {
 
   if (error) {
     return (
-      <div className="p-4 rounded-xl bg-[#FF4B72]/10 border border-[#FF4B72]/30 text-xs text-[#FF4B72] flex items-center justify-between">
+      <div
+        className="p-4 rounded-xl text-xs flex items-center justify-between"
+        style={{
+          backgroundColor: 'rgba(229,62,62,0.08)',
+          border: `1px solid rgba(229,62,62,0.3)`,
+          color: 'var(--sentiment-neg)',
+        }}
+      >
         <div className="flex items-center gap-2">
           <AlertCircle className="h-4 w-4 shrink-0" />
           <span>Error loading statistics: {error}</span>
@@ -51,10 +59,9 @@ export default function StatsGrid({ stats, loading, error }) {
       pct: 100,
       sublabel: total > 0 ? 'All ingested' : 'No reviews',
       icon: MessageSquare,
-      color: '#00F0FF',
-      badgeBg: 'bg-[#00F0FF]/10',
-      badgeText: 'text-[#00F0FF]',
-      barColor: 'bg-[#00F0FF]',
+      color: 'var(--accent)',
+      badgeBg: 'var(--accent-soft)',
+      barColor: 'var(--accent)',
     },
     {
       title: 'Positive',
@@ -62,10 +69,9 @@ export default function StatsGrid({ stats, loading, error }) {
       pct: total > 0 ? (positive / total) * 100 : 0,
       sublabel: `${formatPercent(positive, total)} ratio`,
       icon: ThumbsUp,
-      color: '#10E599',
-      badgeBg: 'bg-[#10E599]/10',
-      badgeText: 'text-[#10E599]',
-      barColor: 'bg-[#10E599]',
+      color: 'var(--sentiment-pos)',
+      badgeBg: 'rgba(56,161,105,0.1)',
+      barColor: 'var(--sentiment-pos)',
     },
     {
       title: 'Neutral',
@@ -73,10 +79,9 @@ export default function StatsGrid({ stats, loading, error }) {
       pct: total > 0 ? (neutral / total) * 100 : 0,
       sublabel: `${formatPercent(neutral, total)} ratio`,
       icon: Minus,
-      color: '#FBBF24',
-      badgeBg: 'bg-[#FBBF24]/10',
-      badgeText: 'text-[#FBBF24]',
-      barColor: 'bg-[#FBBF24]',
+      color: 'var(--sentiment-neu)',
+      badgeBg: 'rgba(214,158,46,0.1)',
+      barColor: 'var(--sentiment-neu)',
     },
     {
       title: 'Negative',
@@ -84,10 +89,9 @@ export default function StatsGrid({ stats, loading, error }) {
       pct: total > 0 ? (negative / total) * 100 : 0,
       sublabel: `${formatPercent(negative, total)} ratio`,
       icon: AlertCircle,
-      color: '#FF4B72',
-      badgeBg: 'bg-[#FF4B72]/10',
-      badgeText: 'text-[#FF4B72]',
-      barColor: 'bg-[#FF4B72]',
+      color: 'var(--sentiment-neg)',
+      badgeBg: 'rgba(229,62,62,0.1)',
+      barColor: 'var(--sentiment-neg)',
     },
     {
       title: 'Needs Reply',
@@ -96,9 +100,8 @@ export default function StatsGrid({ stats, loading, error }) {
       sublabel: needsReply > 0 ? 'Pending answer' : 'All clear',
       icon: HelpCircle,
       color: '#A855F7',
-      badgeBg: 'bg-[#A855F7]/10',
-      badgeText: 'text-[#A855F7]',
-      barColor: 'bg-[#A855F7]',
+      badgeBg: 'rgba(168,85,247,0.1)',
+      barColor: '#A855F7',
     },
   ];
 
@@ -112,31 +115,42 @@ export default function StatsGrid({ stats, loading, error }) {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.04 }}
-            className="rounded-2xl bg-[#0C0C0F] border border-white/10 p-5 md:p-6 min-h-[140px] flex flex-col justify-between hover:border-white/20 transition-all shadow-xl"
+            className="rounded-2xl p-5 md:p-6 min-h-[140px] flex flex-col justify-between transition-all shadow-sm hover:shadow-md"
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              border: `1px solid var(--border)`,
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--border-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; }}
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#8E8E98] tracking-wide truncate">
+              <span className="text-xs font-semibold tracking-wide truncate" style={{ color: 'var(--text-secondary)' }}>
                 {card.title}
               </span>
-              <div className={`p-2 rounded-xl ${card.badgeBg} ${card.badgeText}`}>
+              <div
+                className="p-2 rounded-xl"
+                style={{ backgroundColor: card.badgeBg, color: card.color }}
+              >
                 <Icon className="h-4 w-4" />
               </div>
             </div>
 
             <div className="my-3 flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold text-white tracking-tight">
+              <span className="text-3xl font-extrabold tracking-tight" style={{ color: 'var(--text-primary)' }}>
                 {formatNumber(card.value)}
               </span>
-              <span className="text-xs text-[#8E8E98] font-medium">
+              <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>
                 {card.sublabel}
               </span>
             </div>
 
-            {/* Mini visual indicator bar */}
-            <div className="w-full bg-[#18181E] h-2 rounded-full overflow-hidden">
+            <div className="w-full h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--bg-surface)' }}>
               <div
-                className={`h-full ${card.barColor} transition-all duration-500`}
-                style={{ width: `${Math.min(100, Math.max(0, card.pct))}%` }}
+                className="h-full transition-all duration-500 rounded-full"
+                style={{
+                  width: `${Math.min(100, Math.max(0, card.pct))}%`,
+                  backgroundColor: card.barColor,
+                }}
               />
             </div>
           </motion.div>

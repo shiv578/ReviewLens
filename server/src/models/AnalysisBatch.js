@@ -29,7 +29,11 @@ const analysisBatchSchema = new mongoose.Schema(
       positiveCount: { type: Number, default: 0 },
       neutralCount: { type: Number, default: 0 },
       negativeCount: { type: Number, default: 0 },
+      failedCount: { type: Number, default: 0 },
       duplicateCount: { type: Number, default: 0 },
+      skippedCount: { type: Number, default: 0 },
+      needsReplyCount: { type: Number, default: 0 },
+      cachedCount: { type: Number, default: 0 },
     },
     uploadedAt: {
       type: Date,

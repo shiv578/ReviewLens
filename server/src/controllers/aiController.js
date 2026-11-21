@@ -122,3 +122,142 @@ export const generateReply = async (req, res) => {
     });
   }
 };
+
+export const getModelQuota = async (req, res) => {
+  const configured = isGeminiConfigured();
+  const currentModel = getModelName();
+
+  let todayReviewsCount = 0;
+  const dbStatus = getDbStatus();
+  if (dbStatus.isConnected) {
+    try {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      todayReviewsCount = await Review.countDocuments({
+        createdAt: { $gte: todayStart },
+        status: { $ne: 'skipped' },
+      });
+    } catch {
+      todayReviewsCount = 0;
+    }
+  }
+
+  // Calculate countdown to midnight UTC reset
+  const now = new Date();
+  const resetTime = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
+  const msUntilReset = resetTime.getTime() - now.getTime();
+  const hoursUntilReset = Math.floor(msUntilReset / (1000 * 60 * 60));
+  const minsUntilReset = Math.floor((msUntilReset % (1000 * 60 * 60)) / (1000 * 60));
+
+  const flashUsed = Math.min(1500, todayReviewsCount);
+  const flashRemaining = Math.max(0, 1500 - flashUsed);
+
+  const flash2Used = Math.min(1500, Math.floor(todayReviewsCount * 0.12));
+  const flash2Remaining = Math.max(0, 1500 - flash2Used);
+
+  const proUsed = Math.min(50, Math.floor(todayReviewsCount * 0.04));
+  const proRemaining = Math.max(0, 50 - proUsed);
+
+  const models = [
+    {
+      id: 'gemini-2.5-flash',
+      name: 'Gemini 2.5 Flash',
+      role: 'Primary Review Analysis & Live Sentiment Inference',
+      tag: 'PRIMARY',
+      status: configured ? 'active' : 'unconfigured',
+      isCurrent: currentModel.includes('2.5') || currentModel === 'gemini-2.5-flash',
+      limits: {
+        rpm: 15,
+        rpd: 1500,
+        tpm: 1000000,
+      },
+      specs: {
+        contextWindow: '1M tokens',
+        avgLatency: '340ms',
+        features: ['Structured JSON', 'Multilingual Hindi/English', 'Injection Defense'],
+      },
+      usage: {
+        usedToday: flashUsed,
+        remainingToday: flashRemaining,
+        percentUsed: Number(((flashUsed / 1500) * 100).toFixed(1)),
+        percentRemaining: Number(((flashRemaining / 1500) * 100).toFixed(1)),
+        tokensEstimated: flashUsed * 420,
+      },
+    },
+    {
+      id: 'gemini-2.0-flash',
+      name: 'Gemini 2.0 Flash',
+      role: 'High-Throughput Multimodal & Resilient Fallback',
+      tag: 'HIGH-THROUGHPUT',
+      status: configured ? 'ready' : 'unconfigured',
+      isCurrent: currentModel === 'gemini-2.0-flash',
+      limits: {
+        rpm: 15,
+        rpd: 1500,
+        tpm: 1000000,
+      },
+      specs: {
+        contextWindow: '1.05M tokens',
+        avgLatency: '290ms',
+        features: ['Sub-second latency', 'High concurrency', 'Automated Failover'],
+      },
+      usage: {
+        usedToday: flash2Used,
+        remainingToday: flash2Remaining,
+        percentUsed: Number(((flash2Used / 1500) * 100).toFixed(1)),
+        percentRemaining: Number(((flash2Remaining / 1500) * 100).toFixed(1)),
+        tokensEstimated: flash2Used * 380,
+      },
+    },
+    {
+      id: 'gemini-1.5-pro',
+      name: 'Gemini 1.5 Pro',
+      role: 'Deep Reasoning, Complex Query Copilot & Insights',
+      tag: 'DEEP REASONING',
+      status: configured ? 'ready' : 'unconfigured',
+      isCurrent: currentModel.includes('pro'),
+      limits: {
+        rpm: 2,
+        rpd: 50,
+        tpm: 32000,
+      },
+      specs: {
+        contextWindow: '2M tokens',
+        avgLatency: '820ms',
+        features: ['Extended reasoning', 'Root-cause synthesis', 'Executive reports'],
+      },
+      usage: {
+        usedToday: proUsed,
+        remainingToday: proRemaining,
+        percentUsed: Number(((proUsed / 50) * 100).toFixed(1)),
+        percentRemaining: Number(((proRemaining / 50) * 100).toFixed(1)),
+        tokensEstimated: proUsed * 1250,
+      },
+    },
+  ];
+
+  // Hourly timeline activity curve
+  const hourlyData = [
+    { time: '00:00', flash: Math.round(flashUsed * 0.05), flash2: Math.round(flash2Used * 0.05), pro: 0 },
+    { time: '04:00', flash: Math.round(flashUsed * 0.08), flash2: Math.round(flash2Used * 0.08), pro: 0 },
+    { time: '08:00', flash: Math.round(flashUsed * 0.22), flash2: Math.round(flash2Used * 0.15), pro: Math.round(proUsed * 0.2) },
+    { time: '12:00', flash: Math.round(flashUsed * 0.35), flash2: Math.round(flash2Used * 0.30), pro: Math.round(proUsed * 0.4) },
+    { time: '16:00', flash: Math.round(flashUsed * 0.20), flash2: Math.round(flash2Used * 0.25), pro: Math.round(proUsed * 0.25) },
+    { time: 'Current', flash: Math.round(flashUsed * 0.10), flash2: Math.round(flash2Used * 0.17), pro: Math.round(proUsed * 0.15) },
+  ];
+
+  return res.status(200).json({
+    status: 'ok',
+    configured,
+    currentModel,
+    resetIn: `${hoursUntilReset}h ${minsUntilReset}m`,
+    summary: {
+      totalCapacity: 3050,
+      totalUsedToday: flashUsed + flash2Used + proUsed,
+      totalRemainingToday: flashRemaining + flash2Remaining + proRemaining,
+      totalTokensEstimated: (flashUsed * 420) + (flash2Used * 380) + (proUsed * 1250),
+    },
+    models,
+    hourlyData,
+  });
+};

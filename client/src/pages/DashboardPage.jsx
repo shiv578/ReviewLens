@@ -1,51 +1,48 @@
-import React, { useEffect } from 'react';
-import HeroSection from '../components/dashboard/HeroSection';
-import StatsGrid from '../components/dashboard/StatsGrid';
-import SentimentPulse from '../components/dashboard/SentimentPulse';
-import AIInsightsPanel from '../components/dashboard/AIInsightsPanel';
-import AIAssistant from '../components/assistant/AIAssistant';
-import RecentReviews from '../components/dashboard/RecentReviews';
-import { useStats } from '../hooks/useStats';
-import { useRecentReviews } from '../hooks/useRecentReviews';
+import React, { useState } from 'react';
+import UploadPage from './UploadPage';
+import OverviewPage from './OverviewPage';
+import { Upload, LayoutDashboard } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { stats, loading: statsLoading, error: statsError } = useStats();
-  const { reviews, loading: reviewsLoading, error: reviewsError } = useRecentReviews();
-
-  useEffect(() => {
-    document.title = 'Dashboard | ReviewLens AI';
-  }, []);
-
-  const hasReviews = (stats?.totalReviews || 0) > 0;
+  const [activeTab, setActiveTab] = useState('upload'); // 'upload' | 'overview'
 
   return (
-    <div className="space-y-6">
-      {/* 1. Header & Quick Actions */}
-      <HeroSection lastAnalysis={stats?.lastAnalysis} />
+    <div className="w-full space-y-6 pb-12">
+      {/* Top Toggle Switch between Upload and Overview */}
+      <div className="flex items-center justify-between pb-3 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center gap-2 p-1 rounded-xl" style={{ backgroundColor: 'var(--bg-surface)' }}>
+          <button
+            onClick={() => setActiveTab('upload')}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm"
+            style={{
+              backgroundColor: activeTab === 'upload' ? 'var(--accent)' : 'transparent',
+              color: activeTab === 'upload' ? 'var(--btn-text)' : 'var(--text-secondary)',
+            }}
+          >
+            <Upload className="h-4 w-4" />
+            <span>Upload Dataset</span>
+          </button>
 
-      {/* 2. Key Metrics Bar */}
-      <StatsGrid stats={stats} loading={statsLoading} error={statsError} />
-
-      {/* 3. Core Intelligence Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Sentiment Pulse & AI Insights */}
-        <div className="lg:col-span-7 xl:col-span-8 space-y-6">
-          <SentimentPulse stats={stats} loading={statsLoading} />
-          <AIInsightsPanel hasData={hasReviews} />
-        </div>
-
-        {/* Right Column: AI Assistant Copilot */}
-        <div className="lg:col-span-5 xl:col-span-4">
-          <AIAssistant />
+          <button
+            onClick={() => setActiveTab('overview')}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all shadow-sm"
+            style={{
+              backgroundColor: activeTab === 'overview' ? 'var(--accent)' : 'transparent',
+              color: activeTab === 'overview' ? 'var(--btn-text)' : 'var(--text-secondary)',
+            }}
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            <span>Overview &amp; Analytics</span>
+          </button>
         </div>
       </div>
 
-      {/* 4. Live Review Feed */}
-      <RecentReviews
-        reviews={reviews}
-        loading={reviewsLoading}
-        error={reviewsError}
-      />
+      {/* Render Active View */}
+      {activeTab === 'upload' ? (
+        <UploadPage onAnalysisComplete={() => setActiveTab('overview')} />
+      ) : (
+        <OverviewPage />
+      )}
     </div>
   );
 }
