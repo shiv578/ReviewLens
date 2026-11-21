@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Settings, Key, Database, Info, Eye, EyeOff, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Settings, Key, Database, Info, Eye, EyeOff, RefreshCw, CheckCircle2, AlertCircle, Sparkles, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
+import api from '../services/api';
 
 export default function SettingsPage() {
   const { backendHealth, refreshHealth } = useApp();
   const [apiKey, setApiKey] = useState('');
   const [showKey, setShowKey] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
+  const [selectedModel, setSelectedModel] = useState('gemini-3.5-flash-lite');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState(null);
 
   useEffect(() => {
     document.title = 'Workspace Settings | ReviewLens';
@@ -17,10 +20,35 @@ export default function SettingsPage() {
   const handleSaveApiKey = (e) => {
     e.preventDefault();
     if (!apiKey.trim()) {
-      toast.error('Please enter an API key or set GEMINI_API_KEY in server/.env');
+      toast.error('Please enter an API key or verify GEMINI_API_KEY in server/.env');
       return;
     }
-    toast.success('Settings noted. Ensure GEMINI_API_KEY is placed in server/.env to secure credentials.');
+    toast.success('Key recorded. For security, GEMINI_API_KEY is actively read from server/.env.');
+  };
+
+  const handleTestConnection = async () => {
+    setIsTesting(true);
+    setTestResult(null);
+    try {
+      const response = await api.get('/ai/test');
+      setTestResult({
+        status: 'ok',
+        model: response.data?.model || 'gemini-3.8-flash',
+        message: response.data?.message || 'Gemini 3.8 Flash responded successfully!',
+      });
+      toast.success(`Connected to Gemini (${response.data?.model || 'gemini-3.8-flash'})!`);
+      await refreshHealth();
+    } catch (err) {
+      console.error('Gemini test error:', err);
+      const errMsg = err.response?.data?.error || err.response?.data?.message || err.message;
+      setTestResult({
+        status: 'error',
+        message: errMsg,
+      });
+      toast.error(`Gemini connection test failed: ${errMsg}`);
+    } finally {
+      setIsTesting(false);
+    }
   };
 
   const handleManualRefresh = async () => {
@@ -31,6 +59,8 @@ export default function SettingsPage() {
   };
 
   const isDbConnected = backendHealth?.database?.connected;
+  const isGeminiReady = backendHealth?.gemini?.configured;
+  const activeModel = backendHealth?.gemini?.model || 'gemini-3.8-flash';
 
   return (
     <div className="space-y-6 w-full">
@@ -43,18 +73,32 @@ export default function SettingsPage() {
 
       {/* Section 1: Gemini AI Engine Credentials */}
       <div className="rounded-2xl bg-[#0C0C0F] border border-white/10 p-6 md:p-8 space-y-6 shadow-xl">
-        <div className="flex items-center gap-3 pb-4 border-b border-white/10">
-          <div className="h-9 w-9 rounded-xl bg-[#00F0FF]/10 flex items-center justify-center text-[#00F0FF] border border-[#00F0FF]/25">
-            <Key className="h-5 w-5" />
+        <div className="flex items-center justify-between pb-4 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-[#00F0FF]/10 flex items-center justify-center text-[#00F0FF] border border-[#00F0FF]/25">
+              <Key className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white tracking-tight">
+                Google Gemini API Engine
+              </h3>
+              <p className="text-xs text-[#8E8E98]">
+                Powers real-time sentiment scoring, review topic extraction, and copilot chat
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-base font-bold text-white tracking-tight">
-              Google Gemini API Engine
-            </h3>
-            <p className="text-xs text-[#8E8E98]">
-              Powers sentiment scoring, review topic clustering, and intelligent reply drafting
-            </p>
-          </div>
+
+          {isGeminiReady ? (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#10E599]/10 text-[#10E599] border border-[#10E599]/25 shadow-sm">
+              <span className="h-2 w-2 rounded-full bg-[#10E599] animate-pulse" />
+              Engine Online ({activeModel})
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#FBBF24]/10 text-[#FBBF24] border border-[#FBBF24]/20">
+              <span className="h-2 w-2 rounded-full bg-[#FBBF24]" />
+              Key Not Detected
+            </span>
+          )}
         </div>
 
         <form onSubmit={handleSaveApiKey} className="space-y-4">
@@ -67,8 +111,8 @@ export default function SettingsPage() {
                 type={showKey ? 'text' : 'password'}
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="AIzaSy..."
-                className="w-full pr-10 pl-3.5 py-2.5 rounded-xl bg-[#000000] border border-white/15 text-xs text-white placeholder-[#8E8E98]/50 focus:border-[#00F0FF] focus:outline-none"
+                placeholder={isGeminiReady ? '•••••••••••••••••••••••••••••••• (Active in server/.env)' : 'AQ.Ab8RN6KF...'}
+                className="w-full pr-10 pl-3.5 py-2.5 rounded-xl bg-[#000000] border border-white/15 text-xs text-white placeholder-[#8E8E98]/60 focus:border-[#00F0FF] focus:outline-none"
               />
               <button
                 type="button"
@@ -79,8 +123,11 @@ export default function SettingsPage() {
               </button>
             </div>
             <p className="text-[11px] text-[#8E8E98] leading-relaxed">
-              <strong className="text-white">Security note:</strong> ReviewLens processes all LLM prompts server-side.
-              For production setups, place your key directly in <code>server/.env</code> as <code>GEMINI_API_KEY=your_key</code>.
+              <strong className="text-white">Active Status:</strong> {isGeminiReady ? (
+                <span className="text-[#10E599]">Verified from <code>server/.env</code>. Your live API key is loaded.</span>
+              ) : (
+                <span className="text-[#FBBF24]">Set <code>GEMINI_API_KEY</code> in <code>server/.env</code> to activate.</span>
+              )}
             </p>
           </div>
 
@@ -93,13 +140,33 @@ export default function SettingsPage() {
               onChange={(e) => setSelectedModel(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl bg-[#000000] border border-white/15 text-xs text-white focus:border-[#00F0FF] focus:outline-none"
             >
-              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended - Fastest & Cost Efficient)</option>
-              <option value="gemini-2.5-pro">Gemini 2.5 Pro (Deep Nuance & Complex Synthesis)</option>
-              <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+              <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Recommended - Ultra Fast ~1s Latency)</option>
+              <option value="gemini-3.5-flash">Gemini 3.5 Flash (Balanced Speed & Nuance)</option>
+              <option value="gemini-3.8-flash">Gemini 3.8 Flash (Deep Synthesis)</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
             </select>
           </div>
 
-          <div className="flex justify-end pt-2">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+            <button
+              type="button"
+              onClick={handleTestConnection}
+              disabled={isTesting}
+              className="px-4 py-2.5 rounded-xl font-semibold text-xs text-white bg-white/10 hover:bg-white/15 border border-white/15 transition-all flex items-center gap-2"
+            >
+              {isTesting ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#00F0FF]" />
+                  <span>Testing Connection...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-3.5 w-3.5 text-[#00F0FF]" />
+                  <span>Test Gemini Live Connection</span>
+                </>
+              )}
+            </button>
+
             <button
               type="submit"
               className="px-5 py-2.5 rounded-xl font-semibold text-xs text-black gradient-growth shadow-md shadow-[#00F0FF]/20 hover:opacity-95 transition-all"
@@ -107,6 +174,23 @@ export default function SettingsPage() {
               Save Configuration
             </button>
           </div>
+
+          {testResult && (
+            <div
+              className={`p-3.5 rounded-xl border text-xs flex items-center gap-2.5 ${
+                testResult.status === 'ok'
+                  ? 'bg-[#10E599]/10 border-[#10E599]/30 text-[#10E599]'
+                  : 'bg-[#FF4B72]/10 border-[#FF4B72]/30 text-[#FF4B72]'
+              }`}
+            >
+              {testResult.status === 'ok' ? (
+                <CheckCircle2 className="h-4 w-4 shrink-0" />
+              ) : (
+                <AlertCircle className="h-4 w-4 shrink-0" />
+              )}
+              <span>{testResult.message}</span>
+            </div>
+          )}
         </form>
       </div>
 
@@ -191,7 +275,7 @@ export default function SettingsPage() {
 
         <p className="text-xs text-[#8E8E98] leading-relaxed">
           ReviewLens is an AI review intelligence platform built with React 19, Vite, Tailwind CSS v4, Motion,
-          Express.js, and Google Gemini in a Cyber Minimalist OLED design aesthetic.
+          Express.js, and Google Gemini 3.8 Flash in a Cyber Minimalist OLED design aesthetic.
         </p>
       </div>
     </div>

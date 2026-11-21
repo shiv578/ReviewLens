@@ -1,4 +1,5 @@
 import { getDbStatus } from '../config/db.js';
+import { isGeminiConfigured, getModelName } from '../services/geminiService.js';
 
 export const getHealth = (req, res) => {
   const dbStatus = getDbStatus();
@@ -11,6 +12,10 @@ export const getHealth = (req, res) => {
     database: {
       status: dbStatus.state,
       connected: dbStatus.isConnected,
+    },
+    gemini: {
+      configured: isGeminiConfigured(),
+      model: getModelName(),
     },
     version: '0.1.0',
   });

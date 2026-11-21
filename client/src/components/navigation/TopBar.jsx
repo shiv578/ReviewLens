@@ -194,6 +194,28 @@ export default function TopBar() {
               </span>
             </div>
 
+            {/* Gemini AI Status Pill */}
+            <div
+              title={`Google Gemini Engine: ${backendHealth?.gemini?.configured ? 'Active (' + (backendHealth?.gemini?.model || 'gemini-3.8-flash') + ')' : 'Offline'}`}
+              className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-[#0C0C0F] border border-white/10"
+            >
+              <span className="relative flex h-2 w-2">
+                <span
+                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    backendHealth?.gemini?.configured ? 'bg-[#00F0FF]' : 'bg-[#FBBF24]'
+                  }`}
+                />
+                <span
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    backendHealth?.gemini?.configured ? 'bg-[#00F0FF]' : 'bg-[#FBBF24]'
+                  }`}
+                />
+              </span>
+              <span className="text-[#8E8E98]">
+                {backendHealth?.gemini?.configured ? 'AI Active' : 'AI Offline'}
+              </span>
+            </div>
+
             {/* Notifications Dropdown */}
             <div className="relative" ref={notifRef}>
               <button
