@@ -47,7 +47,7 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="w-full space-y-6">
       {/* Header */}
       <div className="space-y-1">
         <h2 className="text-2xl font-bold text-white tracking-tight">Upload Customer Reviews</h2>
@@ -59,16 +59,15 @@ export default function UploadPage() {
       {/* Dropzone Container */}
       <div
         {...getRootProps()}
-        className={`rounded-3xl border-2 border-dashed p-10 md:p-14 text-center cursor-pointer transition-all ${
-          isDragActive
-            ? 'border-[#10D6A0] bg-[#10D6A0]/5'
-            : 'border-[#20C5F5]/30 bg-[#101A2B] hover:border-[#10D6A0]'
-        }`}
+        className={`rounded-3xl border-2 border-dashed p-10 md:p-14 text-center cursor-pointer transition-all ${isDragActive
+            ? 'border-[#00F0FF] bg-[#00F0FF]/5'
+            : 'border-white/15 bg-[#0C0C0F] hover:border-[#00F0FF]'
+          }`}
       >
         <input {...getInputProps()} />
 
         <div className="max-w-md mx-auto space-y-4">
-          <div className="h-16 w-16 rounded-2xl bg-[#10D6A0]/10 border border-[#10D6A0]/20 flex items-center justify-center mx-auto text-[#10D6A0]">
+          <div className="h-16 w-16 rounded-2xl bg-[#00F0FF]/10 border border-[#00F0FF]/25 flex items-center justify-center mx-auto text-[#00F0FF]">
             <Upload className="h-8 w-8" />
           </div>
 
@@ -76,12 +75,12 @@ export default function UploadPage() {
             <h3 className="text-base font-bold text-white">
               {isDragActive ? 'Drop your CSV file here' : 'Drag & drop your CSV file here'}
             </h3>
-            <p className="text-xs text-[#9BAAC0] mt-1">
-              or <span className="text-[#10D6A0] font-semibold underline">browse local files</span> from your computer
+            <p className="text-xs text-[#8E8E98] mt-1">
+              or <span className="text-[#00F0FF] font-semibold underline">browse local files</span> from your computer
             </p>
           </div>
 
-          <span className="inline-block px-3 py-1 rounded-full bg-white/5 text-[11px] text-[#9BAAC0]">
+          <span className="inline-block px-3 py-1 rounded-full bg-white/5 text-[11px] text-[#8E8E98]">
             Supported format: Standard comma-separated .CSV
           </span>
         </div>
@@ -89,14 +88,17 @@ export default function UploadPage() {
 
       {/* Selected File Details */}
       {selectedFile && (
-        <div className="rounded-2xl bg-[#101A2B] border border-[#10D6A0]/30 p-4 flex items-center justify-between">
+        <div className="rounded-2xl bg-[#0C0C0F] border border-[#00F0FF]/30 p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-[#10D6A0]/10 text-[#10D6A0] flex items-center justify-center">
+            <div className="h-10 w-10 rounded-xl bg-[#00F0FF]/10 text-[#00F0FF] flex items-center justify-center">
               <FileText className="h-5 w-5" />
             </div>
+
             <div>
-              <p className="text-xs font-bold text-white">{selectedFile.name}</p>
-              <p className="text-[10px] text-[#9BAAC0]">
+              <p className="text-xs font-bold text-white">
+                {selectedFile.name}
+              </p>
+              <p className="text-[10px] text-[#8E8E98]">
                 {(selectedFile.size / 1024).toFixed(1)} KB • Ready for processing
               </p>
             </div>
@@ -104,8 +106,9 @@ export default function UploadPage() {
 
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => setSelectedFile(null)}
-              className="p-1.5 rounded-lg text-[#9BAAC0] hover:text-[#F04470] hover:bg-white/5"
+              className="p-1.5 rounded-lg text-[#8E8E98] hover:text-[#FF4B72] hover:bg-white/5"
               title="Remove file"
             >
               <X className="h-4 w-4" />
@@ -144,20 +147,20 @@ export default function UploadPage() {
       </div>
 
       {/* CSV Specification Card */}
-      <div className="rounded-2xl bg-[#080D19] border border-white/5 p-5 space-y-3">
+      <div className="rounded-2xl bg-[#0C0C0F] border border-white/10 p-5 space-y-3">
         <h4 className="text-xs font-bold text-white uppercase tracking-wider">CSV Header Requirements</h4>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <div className="p-3 rounded-xl bg-[#101A2B] border border-white/5">
-            <strong className="text-[#10D6A0] block mb-1">reviewText</strong>
-            <span className="text-[#9BAAC0] text-[11px]">Primary feedback text from the customer. Required.</span>
+          <div className="p-3.5 rounded-xl bg-[#141418] border border-white/5">
+            <strong className="text-[#00F0FF] block mb-1">reviewText</strong>
+            <span className="text-[#8E8E98] text-[11px]">Primary feedback text from the customer. Required.</span>
           </div>
-          <div className="p-3 rounded-xl bg-[#101A2B] border border-white/5">
-            <strong className="text-[#20C5F5] block mb-1">productName</strong>
-            <span className="text-[#9BAAC0] text-[11px]">Product or SKU name. Required for grouping.</span>
+          <div className="p-3.5 rounded-xl bg-[#141418] border border-white/5">
+            <strong className="text-[#10E599] block mb-1">productName</strong>
+            <span className="text-[#8E8E98] text-[11px]">Product or SKU name. Required for grouping.</span>
           </div>
-          <div className="p-3 rounded-xl bg-[#101A2B] border border-white/5">
-            <strong className="text-[#F5B942] block mb-1">rating</strong>
-            <span className="text-[#9BAAC0] text-[11px]">Star score from 1 to 5. Optional.</span>
+          <div className="p-3.5 rounded-xl bg-[#141418] border border-white/5">
+            <strong className="text-[#FBBF24] block mb-1">rating</strong>
+            <span className="text-[#8E8E98] text-[11px]">Star score from 1 to 5. Optional.</span>
           </div>
         </div>
       </div>

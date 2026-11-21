@@ -15,7 +15,7 @@ export default function SentimentPage() {
   const total = stats?.totalReviews || 0;
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white tracking-tight">Sentiment Intelligence</h2>

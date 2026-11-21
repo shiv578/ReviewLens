@@ -32,13 +32,13 @@ export const formatRelativeTime = (dateInput) => {
 export const getSentimentColor = (sentiment) => {
   switch (sentiment?.toLowerCase()) {
     case 'positive':
-      return '#10D6A0'; // Emerald
+      return '#10E599'; // Cyber Emerald
     case 'neutral':
-      return '#F5B942'; // Amber
+      return '#FBBF24'; // Cyber Amber
     case 'negative':
-      return '#F04470'; // Coral
+      return '#FF4B72'; // Cyber Rose
     default:
-      return '#9BAAC0'; // Secondary text
+      return '#8E8E98'; // Muted Gray
   }
 };
 

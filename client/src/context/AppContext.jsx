@@ -4,13 +4,7 @@ import api from '../services/api';
 const AppContext = createContext(null);
 
 export const AppProvider = ({ children }) => {
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth >= 1024;
-    }
-    return true;
-  });
-
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [backendHealth, setBackendHealth] = useState({
     status: 'checking',
@@ -19,12 +13,8 @@ export const AppProvider = ({ children }) => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [notifications, setNotifications] = useState([]);
 
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
-  const closeSidebarMobile = () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-      setSidebarOpen(false);
-    }
-  };
+  const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const fetchBackendHealth = useCallback(async () => {
     try {
@@ -46,24 +36,13 @@ export const AppProvider = ({ children }) => {
     return () => clearInterval(interval);
   }, [fetchBackendHealth]);
 
-  // Handle window resizing for responsive sidebar
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 1024 && sidebarOpen) {
-        setSidebarOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [sidebarOpen]);
-
   return (
     <AppContext.Provider
       value={{
-        sidebarOpen,
-        setSidebarOpen,
-        toggleSidebar,
-        closeSidebarMobile,
+        mobileMenuOpen,
+        setMobileMenuOpen,
+        toggleMobileMenu,
+        closeMobileMenu,
         searchQuery,
         setSearchQuery,
         backendHealth,

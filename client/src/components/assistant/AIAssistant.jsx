@@ -1,13 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Brain, Send, Sparkles, Settings, User } from 'lucide-react';
+import { Brain, Send, Sparkles, Settings } from 'lucide-react';
 
 const SUGGESTED_QUESTIONS = [
-  'What are the most common complaints?',
-  'Which product has the most negative reviews?',
-  'What do customers like the most?',
-  'Summarise the delivery problems',
-  'Which reviews need an urgent reply?',
+  'What are the common complaints?',
+  'Top praised product?',
+  'Reviews needing reply?',
 ];
 
 export default function AIAssistant() {
@@ -16,7 +14,7 @@ export default function AIAssistant() {
     {
       id: 1,
       sender: 'assistant',
-      text: "Hello! I'm your ReviewLens AI assistant. Connect your Gemini API key in Settings to start asking questions directly against your review data.",
+      text: "I'm your ReviewLens AI copilot. Configure your Gemini API key in Settings to query your review dataset.",
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -45,7 +43,7 @@ export default function AIAssistant() {
       {
         id: Date.now() + 1,
         sender: 'assistant',
-        text: "The Gemini AI engine is currently in setup mode and disconnected. To query your review data, please configure your GEMINI_API_KEY in the Workspace Settings.",
+        text: "Gemini AI is currently disconnected. Add your GEMINI_API_KEY in Settings to enable live responses.",
         isWarning: true,
         timestamp: timeNow,
       },
@@ -60,23 +58,23 @@ export default function AIAssistant() {
   };
 
   return (
-    <div className="rounded-3xl bg-[#101A2B] border border-[#9165F5]/20 flex flex-col h-[520px] shadow-xl overflow-hidden">
+    <div className="rounded-2xl bg-[#0C0C0F] border border-white/10 flex flex-col h-[430px] shadow-xl overflow-hidden">
       {/* Header */}
-      <div className="p-4 border-b border-white/5 flex items-center justify-between bg-[#080D19]/40">
+      <div className="p-4 border-b border-white/10 flex items-center justify-between bg-[#000000]/60">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-xl bg-[#9165F5]/10 flex items-center justify-center text-[#9165F5] border border-[#9165F5]/20">
+          <div className="h-8 w-8 rounded-xl bg-[#00F0FF]/10 flex items-center justify-center text-[#00F0FF] border border-[#00F0FF]/25">
             <Brain className="h-4 w-4" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-white tracking-wide">Ask ReviewLens AI</h4>
-            <span className="text-[10px] text-[#9BAAC0]">Review Intelligence Assistant</span>
+            <h4 className="text-xs font-bold text-white tracking-wide">ReviewLens Copilot</h4>
+            <span className="text-[10px] text-[#8E8E98]">AI Review Assistant</span>
           </div>
         </div>
 
-        {/* Gemini Status Badge */}
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#F5B942]/10 text-[#F5B942] border border-[#F5B942]/20">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#F5B942]" />
-          Gemini: Not Connected
+        {/* Status Pill */}
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium bg-[#FBBF24]/10 text-[#FBBF24] border border-[#FBBF24]/25">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#FBBF24]" />
+          Gemini Disconnected
         </span>
       </div>
 
@@ -88,37 +86,37 @@ export default function AIAssistant() {
             className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`max-w-[85%] rounded-2xl p-3 text-xs leading-relaxed ${
+              className={`max-w-[90%] rounded-xl px-3.5 py-2.5 text-xs leading-relaxed ${
                 msg.sender === 'user'
-                  ? 'bg-gradient-to-r from-[#10D6A0] to-[#20C5F5] text-[#080D19] font-medium rounded-tr-none'
+                  ? 'gradient-growth text-black font-semibold rounded-tr-none shadow-md shadow-[#00F0FF]/15'
                   : msg.isWarning
-                  ? 'bg-[#F5B942]/10 border border-[#F5B942]/20 text-[#F4F7FC] rounded-tl-none'
-                  : 'bg-[#080D19] border border-white/5 text-[#F4F7FC] rounded-tl-none'
+                  ? 'bg-[#FBBF24]/10 border border-[#FBBF24]/20 text-[#F4F4F6] rounded-tl-none'
+                  : 'bg-[#141418] border border-white/10 text-[#F4F4F6] rounded-tl-none'
               }`}
             >
               {msg.text}
               {msg.isWarning && (
                 <button
                   onClick={() => navigate('/settings')}
-                  className="mt-2 block text-[11px] font-semibold text-[#10D6A0] hover:underline"
+                  className="mt-1.5 block text-[11px] font-semibold text-[#00F0FF] hover:underline"
                 >
-                  Go to Settings →
+                  Configure in Settings →
                 </button>
               )}
             </div>
-            <span className="text-[9px] text-[#9BAAC0]/60 mt-1 px-1">{msg.timestamp}</span>
+            <span className="text-[9px] text-[#8E8E98]/70 mt-1 px-1">{msg.timestamp}</span>
           </div>
         ))}
         <div ref={chatEndRef} />
       </div>
 
-      {/* Quick Suggestion Chips */}
-      <div className="px-3 py-2 border-t border-white/5 bg-[#080D19]/40 overflow-x-auto flex gap-1.5 no-scrollbar">
+      {/* Suggested Questions */}
+      <div className="px-3.5 py-2 border-t border-white/10 bg-[#000000]/60 overflow-x-auto flex gap-1.5 no-scrollbar">
         {SUGGESTED_QUESTIONS.map((q, idx) => (
           <button
             key={idx}
             onClick={() => handleQuestionClick(q)}
-            className="whitespace-nowrap px-2.5 py-1 rounded-full text-[10px] font-medium bg-white/5 hover:bg-white/10 text-[#9BAAC0] hover:text-white border border-white/5 transition-colors"
+            className="whitespace-nowrap px-2.5 py-1 rounded-md text-[10px] font-medium bg-[#141418] hover:bg-white/10 text-[#8E8E98] hover:text-white border border-white/5 transition-colors"
           >
             {q}
           </button>
@@ -126,18 +124,18 @@ export default function AIAssistant() {
       </div>
 
       {/* Input Form */}
-      <form onSubmit={handleSend} className="p-3 border-t border-white/5 bg-[#101A2B] flex gap-2">
+      <form onSubmit={handleSend} className="p-3 border-t border-white/10 bg-[#0C0C0F] flex gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask a question about your reviews..."
-          className="flex-1 px-3 py-2 rounded-xl bg-[#080D19] border border-white/10 text-xs text-white placeholder-[#9BAAC0]/60 focus:border-[#10D6A0] focus:outline-none"
+          placeholder="Ask a question..."
+          className="flex-1 px-3.5 py-2 rounded-xl bg-[#000000] border border-white/10 text-xs text-white placeholder-[#8E8E98]/50 focus:border-[#00F0FF] focus:outline-none"
         />
         <button
           type="submit"
           disabled={!input.trim()}
-          className="px-3.5 py-2 rounded-xl gradient-growth text-[#080D19] font-semibold text-xs disabled:opacity-40 disabled:pointer-events-none hover:opacity-95 transition-all flex items-center justify-center"
+          className="px-3.5 py-2 rounded-xl gradient-growth text-black font-semibold text-xs disabled:opacity-40 disabled:pointer-events-none hover:opacity-95 transition-all flex items-center justify-center"
           aria-label="Send message"
         >
           <Send className="h-3.5 w-3.5" />
