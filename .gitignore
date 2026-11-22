@@ -1,16 +1,17 @@
-# Dependencies
+# Dependencies for the noode js
 node_modules/
 /.pnp
 .pnp.js
 
 # Environment variables
+#save the api key fromgithub
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 !.env.example
-
+#for the productionn
 # Production build artifacts
 dist/
 dist-ssr/
