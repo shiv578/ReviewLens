@@ -1,22 +1,21 @@
-ReviewLens – AI Review Insights
-CEDCOSS Technical Assessment | AI-powered Customer Review Analysis
-
+ReviewLens – AI ReviewInsights
+CEDCOSS Technical Assessment AI-powered Customer Review Analysiss
+###
 ReviewLens is a web application I built to help businesses understand customer feedback without reading every review manually. A user uploads a CSV file containing product reviews, and ReviewLens cleans the data, analyzes the feedback with Google Gemini, and presents the results in a dashboard.
 
 The aim is simple: turn raw reviews into useful information. Instead of looking through dozens of comments, a store team can quickly see how customers feel, which problems appear most often, what customers appreciate, and which reviews need a reply.
 What ReviewLens does
-- Uploads a CSV file of customer reviews from the browser.
-- Handles empty reviews, invalid or missing ratings, and duplicate review text.
+ Uploads a CSV file of customer reviews from the browser.
+ Handles empty reviews, invalid or missing ratings, and duplicate review text.
 - Uses Google Gemini to identify sentiment, topics, a short English summary, and whether a response is needed.
-- Validates AI responses before accepting them.
-- Retries invalid responses and handles temporary API failures.
-- Processes reviews in small batches instead of sending everything at once.
-- Reuses previously analyzed reviews through a text-hash cache.
+ Validates AI responses before accepting them.
+- Retries invalid responses and handles temporary API  failures.
+- Processes reviews in small batches instead of sending everything at once. Reuses previously analyzed reviews through a text-hash cache.
 - Shows review statistics, common complaints and praises, and filterable results.
 - Generates a suggested customer-service reply only when requested.
 Technology stack
-Area	Tools
-Frontend	React, Vite, Tailwind CSS, Motion, Recharts, Lucide React, Axios, React Dropzone, React Hot Toast
+Area   	Tools
+Frontend	React, Vite, Tailwind CSS, Motion, Recharts, Lucide React, Axios, React Dropzone, React Hot Toast  
 Backend	Node.js, Express, MongoDB, Mongoose
 AI	Google Gemini through @google/genai
 CSV processing	Multer, PapaParse
@@ -24,10 +23,9 @@ Validation	Zod
 Caching	SHA-256 text hashes and a persistent JSON cache
 Testing	Vitest, Supertest
 
-
 How the application works
-1. Upload: The user selects a CSV file from the Upload page.
-2. Clean: The backend parses the file and checks for empty text, missing or invalid ratings, and duplicate reviews.
+1 Upload: The user selects a CSV file from the Upload page.
+ Clean: The backend parses the file and checks for empty text, missing or invalid ratings, and duplicate reviews.
 3. Check cache: Reviews that have already been analyzed can reuse their saved results.
 4. Analyze: Remaining valid reviews are sent to Gemini in controlled batches.
 5. Validate: The backend checks each AI response against the required JSON schema. Invalid responses are retried once.
@@ -46,7 +44,6 @@ Missing rating	Keep the review and treat the rating as unknown (null in stored d
 Invalid rating such as five	Treat the rating as unknown rather than rejecting the whole review
 Duplicate review text	Analyze the text once and reuse the result
 Hindi or Hinglish review	Analyze the meaning and write the summary in English
-
 
 To identify duplicates, ReviewLens normalizes the review text (lowercase with repeated whitespace removed) and creates a SHA-256 hash. This also helps the cache recognize previously analyzed text.
 
