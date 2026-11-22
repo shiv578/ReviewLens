@@ -60,6 +60,10 @@ const reviewSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    suggestedReplyHindi: {
+      type: String,
+      default: null,
+    },
     replyStatus: {
       type: String,
       enum: ['pending', 'drafted', 'sent', 'ignored'],

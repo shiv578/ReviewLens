@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MessageSquareReply, Sparkles, Settings, Copy, Check, Loader2, RefreshCw } from 'lucide-react';
+import { MessageSquareReply, Sparkles, Settings, Copy, Check, Loader2, RefreshCw, Languages } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useApp } from '../context/AppContext';
 import api from '../services/api';
@@ -11,6 +11,7 @@ export default function AIReplyPage() {
   const isGeminiReady = Boolean(backendHealth?.gemini?.configured);
   const geminiModel = backendHealth?.gemini?.model || 'gemini-3.8-flash';
 
+  const [language, setLanguage] = useState('english');
   const [tone, setTone] = useState('empathic');
   const [productName, setProductName] = useState('Wireless Noise-Cancelling Headphones');
   const [sampleReview, setSampleReview] = useState(
@@ -43,10 +44,11 @@ export default function AIReplyPage() {
         reviewText: sampleReview,
         tone,
         productName: productName.trim() || undefined,
+        language,
       });
 
       setGeneratedReply(response.data?.reply || '');
-      toast.success(`Drafted reply with ${response.data?.model || 'Gemini'}!`);
+      toast.success(`Drafted ${language === 'hindi' ? 'Hindi' : 'English'} reply with ${response.data?.model || 'Gemini'}!`);
     } catch (err) {
       console.error('Error generating reply:', err);
       toast.error(err.response?.data?.message || 'Failed to generate reply from Gemini');
@@ -115,6 +117,38 @@ export default function AIReplyPage() {
             placeholder="Paste or enter customer review here..."
             className="w-full p-3.5 rounded-xl bg-[#000000] border border-white/10 text-xs text-white placeholder-[#8E8E98]/60 focus:border-[#00F0FF] focus:outline-none"
           />
+        </div>
+
+        {/* Language Selection */}
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+            <Languages className="w-3.5 h-3.5 text-[#00F0FF]" />
+            <span>Response Language Mode</span>
+          </label>
+          <div className="grid grid-cols-2 gap-3 max-w-sm">
+            <button
+              type="button"
+              onClick={() => setLanguage('english')}
+              className={`p-3 rounded-xl text-xs font-semibold border text-center transition-all ${
+                language === 'english'
+                  ? 'border-[#9165F5] bg-[#9165F5]/15 text-white shadow-sm'
+                  : 'border-white/5 bg-[#141418] text-[#8E8E98] hover:text-white'
+              }`}
+            >
+              English
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('hindi')}
+              className={`p-3 rounded-xl text-xs font-semibold border text-center transition-all ${
+                language === 'hindi'
+                  ? 'border-[#FF4B72] bg-[#FF4B72]/15 text-white shadow-sm'
+                  : 'border-white/5 bg-[#141418] text-[#8E8E98] hover:text-white'
+              }`}
+            >
+              हिन्दी (Hindi)
+            </button>
+          </div>
         </div>
 
         {/* Tone Selection */}

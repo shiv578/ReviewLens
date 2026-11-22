@@ -302,7 +302,7 @@ export const getReviews = async (req, res) => {
  */
 export const generateSuggestedReply = async (req, res) => {
   const { id } = req.params;
-  const { tone = 'empathic' } = req.body;
+  const { tone = 'empathic', language = 'english' } = req.body;
 
   const dbStatus = getDbStatus();
 
@@ -326,10 +326,15 @@ export const generateSuggestedReply = async (req, res) => {
       reviewText,
       tone,
       productName,
+      language,
     });
 
     if (review) {
-      review.suggestedReply = reply;
+      if (language === 'hindi' || language === 'hi') {
+        review.suggestedReplyHindi = reply;
+      } else {
+        review.suggestedReply = reply;
+      }
       review.replyStatus = 'drafted';
       await review.save();
     }
@@ -337,6 +342,7 @@ export const generateSuggestedReply = async (req, res) => {
     return res.status(200).json({
       status: 'ok',
       reply,
+      language,
       reviewId: id,
     });
   } catch (error) {

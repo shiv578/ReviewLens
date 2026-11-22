@@ -512,7 +512,12 @@ export async function processAllReviewsWithBatchesAndCache(rawReviews, batchSize
   return processedResults;
 }
 
-export const generateCustomerReply = async ({ reviewText, tone = 'empathic', productName = 'our product' }) => {
+export const generateCustomerReply = async ({
+  reviewText,
+  tone = 'empathic',
+  productName = 'our product',
+  language = 'english',
+}) => {
   const ai = getAIClient();
   if (!ai) {
     throw new Error('GEMINI_API_KEY is not configured');
@@ -524,16 +529,27 @@ export const generateCustomerReply = async ({ reviewText, tone = 'empathic', pro
     concise: 'Direct, clear, concise, and focused on swift resolution or customer support contact.',
   };
 
+  const isHindi = language && (language.toLowerCase() === 'hindi' || language.toLowerCase() === 'hi');
+  const languageInstruction = isHindi
+    ? 'IMPORTANT: Write the entire response in polite, professional, and empathetic Hindi (using Devanagari script). Sign off as "कस्टमर सपोर्ट टीम".'
+    : 'Write the response in natural, fluent, and empathetic English. Sign off as "The Support Team".';
+
   const prompt = `You are a professional customer experience manager responding to a customer review for "${productName}".
 Review: "${reviewText}"
 Tone: ${toneInstructions[tone] || toneInstructions.empathic}
+Language Requirement: ${languageInstruction}
 
-Write a helpful, genuine, and brand-safe response. Keep it under 120 words. Do not include placeholders like "[Your Name]"—sign off as "The Support Team".`;
+Write a helpful, genuine, and brand-safe response. Keep it under 120 words. Do not include placeholders like "[Your Name]".`;
 
   const model = getModelName();
   const res = await generateWithFallback(ai, model, prompt);
 
-  return res.text?.trim() || 'Thank you for your feedback. We are committed to making this right.';
+  return (
+    res.text?.trim() ||
+    (isHindi
+      ? `नमस्ते, "${productName}" के साथ आपके असंतोषजनक अनुभव के लिए हमें बेहद खेद है। हम आपकी समस्या को गंभीरता से लेते हैं और तुरंत इसका समाधान करना चाहते हैं। कृपया अपने ऑर्डर विवरण के साथ हमारी टीम से संपर्क करें ताकि हम त्वरित सहायता कर सकें।\n\nकस्टमर सपोर्ट टीम`
+      : `We are truly sorry to hear about your experience with ${productName}. We want to make this right for you immediately. Please reach out to us directly with your order details so we can resolve this for you.\n\nThe Support Team`)
+  );
 };
 
 export const answerCopilotQuery = async ({ question, reviews = [] }) => {

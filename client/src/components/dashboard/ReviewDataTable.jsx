@@ -13,6 +13,7 @@ import {
   RefreshCw,
   X,
   ChevronDown,
+  Languages,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../../services/api';
@@ -31,9 +32,11 @@ export default function ReviewDataTable() {
   const [selectedTopic, setSelectedTopic] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Suggested Reply on-click state (Requirement 7)
+  // Suggested Reply on-click state & language mode
   const [generatingReplyId, setGeneratingReplyId] = useState(null);
-  const [activeReply, setActiveReply] = useState(null); // { id, text }
+  const [expandedReplyId, setExpandedReplyId] = useState(null);
+  const [replyLang, setReplyLang] = useState({}); // { [id]: 'english' | 'hindi' }
+  const [replyCache, setReplyCache] = useState({}); // { [id]: { english: '...', hindi: '...' } }
   const [copiedId, setCopiedId] = useState(null);
 
   const fetchReviews = useCallback(async () => {
@@ -61,28 +64,78 @@ export default function ReviewDataTable() {
     fetchReviews();
   }, [fetchReviews]);
 
-  // Generate reply on click (Requirement 7: "generated on click, not upfront")
-  const handleGenerateReply = async (review) => {
-    setGeneratingReplyId(review._id || review.reviewId);
+  // Generate or toggle reply with multi-language mode (English / Hindi)
+  const handleToggleOrGenerateReply = async (review, targetLang) => {
+    const rId = review._id || review.reviewId;
+    const currentLang = targetLang || replyLang[rId] || 'english';
+
+    // If clicking main button and already open with same language, toggle closed
+    if (expandedReplyId === rId && !targetLang) {
+      setExpandedReplyId(null);
+      return;
+    }
+
+    setExpandedReplyId(rId);
+
+    // Check if we already have the reply cached in memory or review document
+    const cachedText =
+      replyCache[rId]?.[currentLang] ||
+      (currentLang === 'english' ? review.suggestedReply : review.suggestedReplyHindi);
+
+    if (cachedText) {
+      setReplyCache((prev) => ({
+        ...prev,
+        [rId]: {
+          ...prev[rId],
+          [currentLang]: cachedText,
+        },
+      }));
+      setReplyLang((prev) => ({ ...prev, [rId]: currentLang }));
+      return;
+    }
+
+    // Fetch from Gemini via API with selected language mode
+    setGeneratingReplyId(rId);
+    setReplyLang((prev) => ({ ...prev, [rId]: currentLang }));
+
     try {
-      const res = await api.post(`/reviews/${review._id || review.reviewId}/reply`, {
+      const res = await api.post(`/reviews/${rId}/reply`, {
         reviewText: review.reviewText,
         productName: review.productName,
         tone: 'empathic',
+        language: currentLang,
       });
 
-      const replyText = res.data?.reply || 'Thank you for your feedback.';
-      setActiveReply({ id: review._id || review.reviewId, text: replyText });
+      const replyText =
+        res.data?.reply ||
+        (currentLang === 'hindi'
+          ? 'आपकी प्रतिक्रिया के लिए धन्यवाद। हम त्वरित सहायता के लिए प्रतिबद्ध हैं।'
+          : 'Thank you for your feedback. We are committed to making this right.');
+
+      setReplyCache((prev) => ({
+        ...prev,
+        [rId]: {
+          ...prev[rId],
+          [currentLang]: replyText,
+        },
+      }));
 
       // Update in-memory review record
       setReviews((prev) =>
         prev.map((r) =>
-          (r._id === review._id || r.reviewId === review.reviewId)
-            ? { ...r, suggestedReply: replyText, replyStatus: 'drafted' }
+          r._id === review._id || r.reviewId === review.reviewId
+            ? {
+                ...r,
+                ...(currentLang === 'hindi'
+                  ? { suggestedReplyHindi: replyText }
+                  : { suggestedReply: replyText }),
+                replyStatus: 'drafted',
+              }
             : r
         )
       );
-      toast.success('Generated empathetic reply with Gemini!');
+
+      toast.success(`Drafted ${currentLang === 'hindi' ? 'Hindi' : 'English'} reply with Gemini!`);
     } catch (err) {
       console.error('Error generating reply on demand:', err);
       toast.error('Failed to generate reply: ' + (err.response?.data?.message || err.message));
@@ -268,10 +321,19 @@ export default function ReviewDataTable() {
                   analysis_failed: 'bg-[#8E8E98]/15 text-[#8E8E98] border-[#8E8E98]/30',
                 };
 
+                const rId = r._id || r.reviewId;
                 const isNeedsReply = Boolean(r.needs_reply);
-                const hasExistingReply = Boolean(r.suggestedReply);
-                const isGeneratingThis = generatingReplyId === (r._id || r.reviewId);
-                const isReplyExpanded = activeReply?.id === (r._id || r.reviewId) || hasExistingReply;
+                const currentLang = replyLang[rId] || 'english';
+                const currentReplyText =
+                  replyCache[rId]?.[currentLang] ||
+                  (currentLang === 'english' ? r.suggestedReply : r.suggestedReplyHindi) ||
+                  (currentLang === 'hindi' && r.suggestedReplyHindi ? r.suggestedReplyHindi : null) ||
+                  replyCache[rId]?.english ||
+                  r.suggestedReply;
+
+                const hasExistingReply = Boolean(r.suggestedReply || r.suggestedReplyHindi || replyCache[rId]);
+                const isGeneratingThis = generatingReplyId === rId;
+                const isReplyExpanded = expandedReplyId === rId || (hasExistingReply && expandedReplyId === null && false);
 
                 return (
                   <React.Fragment key={r._id || idx}>
@@ -346,10 +408,12 @@ export default function ReviewDataTable() {
                       <td className="p-3.5 whitespace-nowrap">
                         {isNeedsReply ? (
                           <button
-                            onClick={() => handleGenerateReply(r)}
+                            onClick={() => handleToggleOrGenerateReply(r)}
                             disabled={isGeneratingThis}
                             className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
-                              hasExistingReply
+                              expandedReplyId === rId
+                                ? 'bg-[#9165F5] text-white shadow-md'
+                                : hasExistingReply
                                 ? 'bg-[#9165F5]/15 text-[#9165F5] border border-[#9165F5]/30 hover:bg-[#9165F5]/25'
                                 : 'bg-[#FF4B72]/15 text-[#FF4B72] border border-[#FF4B72]/30 hover:bg-[#FF4B72]/25'
                             }`}
@@ -358,6 +422,11 @@ export default function ReviewDataTable() {
                               <>
                                 <Loader2 className="h-3 w-3 animate-spin" />
                                 <span>Drafting...</span>
+                              </>
+                            ) : expandedReplyId === rId ? (
+                              <>
+                                <Check className="h-3 w-3" />
+                                <span>Hide Reply</span>
                               </>
                             ) : hasExistingReply ? (
                               <>
@@ -379,36 +448,84 @@ export default function ReviewDataTable() {
                       </td>
                     </tr>
 
-                    {/* Inline Suggested Reply Card if generated */}
-                    {(isReplyExpanded && (activeReply?.id === (r._id || r.reviewId) || r.suggestedReply)) && (
+                    {/* Inline Suggested Reply Card with Bilingual Mode (English / Hindi) */}
+                    {expandedReplyId === rId && (
                       <tr className="bg-[#101015]/80">
                         <td colSpan={7} className="p-4 border-b border-white/10">
-                          <div className="rounded-xl bg-[#08080C] border border-[#9165F5]/30 p-4 space-y-2">
-                            <div className="flex items-center justify-between">
+                          <div className="rounded-xl bg-[#08080C] border border-[#9165F5]/40 p-4 space-y-3 shadow-lg">
+                            <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-white/5">
                               <span className="text-xs font-bold text-[#9165F5] uppercase tracking-wider flex items-center gap-1.5">
-                                <Sparkles className="h-3.5 w-3.5" />
+                                <Sparkles className="h-3.5 w-3.5 text-[#9165F5]" />
                                 Suggested Empathetic Reply for {r.reviewId || 'Review'}
                               </span>
-                              <button
-                                onClick={() => handleCopy(r._id || r.reviewId, activeReply?.text || r.suggestedReply)}
-                                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white/10 hover:bg-white/15 text-white transition-colors"
-                              >
-                                {copiedId === (r._id || r.reviewId) ? (
-                                  <>
-                                    <Check className="h-3 w-3 text-[#10E599]" />
-                                    <span>Copied!</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Copy className="h-3 w-3" />
-                                    <span>Copy Reply</span>
-                                  </>
-                                )}
-                              </button>
+
+                              <div className="flex items-center gap-2">
+                                {/* Language Mode Selector: English / Hindi */}
+                                <div className="flex items-center bg-[#141418] p-0.5 rounded-lg border border-white/10">
+                                  <span className="px-2 text-[#8E8E98] flex items-center gap-1 text-[11px] font-medium">
+                                    <Languages className="w-3.5 h-3.5 text-[#00F0FF]" />
+                                    <span className="hidden sm:inline">Mode:</span>
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleOrGenerateReply(r, 'english')}
+                                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                                      currentLang === 'english'
+                                        ? 'bg-[#9165F5] text-white shadow-sm'
+                                        : 'text-[#8E8E98] hover:text-white'
+                                    }`}
+                                  >
+                                    English
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleToggleOrGenerateReply(r, 'hindi')}
+                                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                                      currentLang === 'hindi'
+                                        ? 'bg-[#FF4B72] text-white shadow-sm'
+                                        : 'text-[#8E8E98] hover:text-white'
+                                    }`}
+                                  >
+                                    हिन्दी (Hindi)
+                                  </button>
+                                </div>
+
+                                {/* Copy Button */}
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopy(rId, currentReplyText)}
+                                  disabled={!currentReplyText || isGeneratingThis}
+                                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium bg-white/10 hover:bg-white/15 text-white transition-colors disabled:opacity-50"
+                                >
+                                  {copiedId === rId ? (
+                                    <>
+                                      <Check className="h-3 w-3 text-[#10E599]" />
+                                      <span>Copied!</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="h-3 w-3" />
+                                      <span>Copy Reply</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
                             </div>
-                            <p className="text-xs text-white leading-relaxed whitespace-pre-line font-normal">
-                              {activeReply?.id === (r._id || r.reviewId) ? activeReply.text : r.suggestedReply}
-                            </p>
+
+                            {/* Reply Text Body */}
+                            {isGeneratingThis ? (
+                              <div className="py-4 flex items-center gap-2 text-xs text-[#8E8E98]">
+                                <Loader2 className="w-4 h-4 animate-spin text-[#9165F5]" />
+                                <span>
+                                  Drafting empathetic reply in {currentLang === 'hindi' ? 'Hindi (हिन्दी)' : 'English'} with Gemini AI...
+                                </span>
+                              </div>
+                            ) : (
+                              <p className="text-xs text-white leading-relaxed whitespace-pre-line font-normal bg-[#0C0C10] p-3 rounded-lg border border-white/5">
+                                {currentReplyText ||
+                                  `No reply drafted in ${currentLang === 'hindi' ? 'Hindi' : 'English'} yet. Click the language button above to generate.`}
+                              </p>
+                            )}
                           </div>
                         </td>
                       </tr>

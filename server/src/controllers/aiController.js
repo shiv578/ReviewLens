@@ -87,7 +87,7 @@ export const chat = async (req, res) => {
 };
 
 export const generateReply = async (req, res) => {
-  const { reviewText, tone = 'empathic', productName } = req.body;
+  const { reviewText, tone = 'empathic', productName, language = 'english' } = req.body;
   if (!reviewText || !reviewText.trim()) {
     return res.status(400).json({
       status: 'error',
@@ -107,11 +107,13 @@ export const generateReply = async (req, res) => {
       reviewText: reviewText.trim(),
       tone,
       productName: productName?.trim() || 'our product',
+      language,
     });
 
     return res.status(200).json({
       status: 'ok',
       reply,
+      language,
     });
   } catch (error) {
     console.error('[AI Controller] Generate reply error:', error.message);
